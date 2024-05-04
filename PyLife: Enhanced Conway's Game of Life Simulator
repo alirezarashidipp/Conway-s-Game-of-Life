@@ -1,0 +1,111 @@
+import pygame
+import random
+from tkinter import Tk, Label, Entry, Button
+
+def get_neighbors(x, y, grid):
+    """
+    Calculate the number of living neighbors around a given cell in the grid.
+
+    :param x: x-coordinate of the cell
+    :param y: y-coordinate of the cell
+    :param grid: the grid of cells
+    :return: count of living neighbors
+    """
+    row, column = len(grid), len(grid[0])
+    neighbors_count = 0
+    for dx in (-1, 0, 1):
+        for dy in (-1, 0, 1):
+            if dx == 0 and dy == 0:
+                continue
+            nx, ny = x + dx, y + dy
+            if 0 <= nx < row and 0 <= ny < column and grid[nx][ny] == 'X':
+                neighbors_count += 1
+    return neighbors_count
+
+def update_grid(grid):
+    """
+    Apply Conway's Game of Life rules to the grid and return the new grid.
+
+    :param grid: the current state of the grid
+    :return: the updated grid
+    """
+    row, column = len(grid), len(grid[0])
+    new_grid = []
+    for i in range(row):
+        new_row = []
+        for j in range(column):
+            neighbors = get_neighbors(i, j, grid)
+            if grid[i][j] == 'X' and neighbors in (2, 3):
+                new_row.append('X')
+            elif grid[i][j] == '.' and neighbors == 3:
+                new_row.append('X')
+            else:
+                new_row.append('.')
+        new_grid.append(''.join(new_row))
+    return new_grid
+
+def create_random_grid(row, column):
+    """
+    Generate a grid with random live and dead cells.
+
+    :param row: number of rows in the grid
+    :param column: number of columns in the grid
+    :return: a grid of randomly placed live ('X') and dead ('.') cells
+    """
+    return [''.join(random.choice(['.', 'X']) for _ in range(column)) for _ in range(row)]
+
+def run_simulation(row, column):
+    """
+    Initialize the Pygame window and run the simulation loop.
+
+    :param row: number of rows in the grid
+    :param column: number of columns in the grid
+    """
+    pygame.init()
+    cell_size = 10
+    size = width, height = cell_size * column, cell_size * row
+    window = pygame.display.set_mode(size)
+    pygame.display.set_caption("Conway's Game of Life")
+
+    grid = create_random_grid(row, column)
+
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+
+        grid = update_grid(grid)
+        window.fill((100, 100, 100))
+
+        for i in range(row):
+            for j in range(column):
+                color = (255, 255, 255) if grid[i][j] == 'X' else (0, 0, 0)
+                pygame.draw.rect(window, color, (j * cell_size, i * cell_size, cell_size, cell_size))
+
+        pygame.display.flip()
+    pygame.quit()
+
+def main():
+    """
+    Main function to create the GUI for input and run the simulation.
+    """
+    window = Tk()
+    window.title("Conway's Game of Life Simulator")
+
+    Label(window, text="Rows:").grid(row=0, column=0)
+    row_entry = Entry(window, width=10)
+    row_entry.grid(row=0, column=1)
+
+    Label(window, text="Columns:").grid(row=1, column=0)
+    column_entry = Entry(window, width=10)
+    column_entry.grid(row=1, column=1)
+
+    start_button = Button(window, text="Start Simulation",
+                          command=lambda: run_simulation(int(row_entry.get()), int(column_entry.get())))
+    start_button.grid(row=2, column=0, columnspan=2)
+
+    window.mainloop()
+
+if __name__ == "__main__":
+    main()
