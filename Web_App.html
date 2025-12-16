@@ -1,63 +1,33 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <title>Qlik Sense Cloud Mashup</title>
+<script>
+  require.config({
+    baseUrl: "https://uk-qlik-sharedinsight-dev.uk.hsbc/resources"
+  });
 
-  <!-- Qlik requires same-origin cookies -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  require(["js/qlik"], function (qlik) {
 
-  <!-- RequireJS from Qlik Cloud -->
-  <script src="https://uk-qlik-sharedinsight-dev.uk.hsbc/resources/assets/external/requirejs/require.js"></script>
+    console.log("Qlik JS loaded");
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-    }
-    #pie1 {
-      width: 600px;
-      height: 400px;
-    }
-  </style>
-</head>
-
-<body>
-
-  <h2>Embedded Qlik Object</h2>
-
-  <!-- Container for the Qlik object -->
-  <div id="pie1"></div>
-
-  <script>
-    require.config({
-      baseUrl: "https://uk-qlik-sharedinsight-dev.uk.hsbc/resources"
+    qlik.setOnError(function (error) {
+      console.error("Qlik error:", error);
     });
 
-    require(["js/qlik"], function (qlik) {
+    const app = qlik.openApp(
+      "73bfe3db-362d-47c9-b1aa-fd9401e6f15b",
+      {
+        host: "uk-qlik-sharedinsight-dev.uk.hsbc",
+        isSecure: true
+      }
+    );
 
-      // Optional: log Qlik errors
-      qlik.setOnError(function (error) {
-        console.error("Qlik error:", error);
+    console.log("App opened", app);
+
+    app.getObject("pie1", "97cf6ee0-9c82-4aee-bca5-e182f2ca4352")
+      .then(function () {
+        console.log("Object rendered");
+      })
+      .catch(function (err) {
+        console.error("getObject failed", err);
       });
 
-      // Open the app
-      const app = qlik.openApp(
-        "73bfe3db-362d-47c9-b1aa-fd9401e6f15b",
-        {
-          host: "uk-qlik-sharedinsight-dev.uk.hsbc",
-          isSecure: true
-        }
-      );
-
-      // Render the object
-      app.getObject(
-        "pie1",
-        "97cf6ee0-9c82-4aee-bca5-e182f2ca4352"
-      );
-
-    });
-  </script>
-
-</body>
-</html>
+  });
+</script>
