@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Qlik Cloud Mashup (Reuse Object)</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- RequireJS from Qlik Cloud -->
+  <script src="https://uk-qlik-sharedinsight-dev.uk.hsbc/resources/assets/external/requirejs/require.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    #qlik-object {
+      width: 800px;
+      height: 500px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h2>Embedded Qlik Object</h2>
+
+  <div id="qlik-object"></div>
+
+  <script>
+    require.config({
+      baseUrl: "https://uk-qlik-sharedinsight-dev.uk.hsbc/resources"
+    });
+
+    require(["js/qlik"], function (qlik) {
+
+      qlik.setOnError(function (error) {
+        console.error(error);
+      });
+
+      const app = qlik.openApp(
+        "73bfe3db-362d-47c9-b1aa-fd9401e6f15b",
+        {
+          host: "uk-qlik-sharedinsight-dev.uk.hsbc",
+          secure: true,
+          port: 443,
+          prefix: "/"
+        }
+      );
+
+      app.getObject(
+        "qlik-object",
+        "97cf6ee0-9c82-4aee-bca5-e182f2ca4352"
+      );
+
+    });
+  </script>
+
+</body>
+</html>
