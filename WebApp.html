@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Analysis | HSBC Style</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .hsbc-red { background-color: #db0011; }
+        .hsbc-red-text { color: #db0011; }
+        .hsbc-hover:hover { background-color: #b3000e; }
+        
+        /* Animation for results */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
+
+    <div class="bg-white rounded-sm shadow-xl w-full max-w-3xl overflow-hidden border-t-4 border-[#db0011]">
+        
+        <!-- Header -->
+        <div class="bg-white p-6 border-b border-gray-200 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                
+                <!-- HSBC Logo Section -->
+                <!-- 
+                   Priority 1: Uses the file you uploaded (image_6e865c.png)
+                   Priority 2 (Fallback): Uses the official SVG from Wikimedia if local file is missing
+                -->
+                <img 
+                    src="./image_6e865c.png" 
+                    onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/a/aa/HSBC_logo_%282018%29.svg';" 
+                    alt="HSBC Logo" 
+                    class="h-12 w-auto object-contain"
+                >
+                
+                <div class="border-l border-gray-300 h-10"></div>
+                
+                <div>
+                    <h1 class="text-xl font-semibold text-gray-800 tracking-tight">Global AI Analysis</h1>
+                    <p class="text-gray-500 text-xs uppercase tracking-wider">Internal Tool</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Body -->
+        <div class="p-8 space-y-6">
+            
+            <div class="space-y-2">
+                <label for="inputText" class="block text-gray-700 font-medium">Input Text</label>
+                <p class="text-gray-500 text-sm mb-2">Please enter the text content you wish to analyze for readability and quality scoring.</p>
+                <textarea id="inputText" rows="8" 
+                    class="w-full p-4 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-[#db0011] focus:border-[#db0011] transition resize-none font-light bg-gray-50"
+                    placeholder="Type or paste your content here..."></textarea>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="analyzeText()" id="submitBtn"
+                    class="hsbc-red hsbc-hover text-white font-medium py-3 px-8 rounded-sm transition duration-200 flex items-center shadow-sm uppercase tracking-wide text-sm">
+                    <span id="btnText">Analyze Text</span>
+                    <!-- Loading Spinner -->
+                    <svg id="loadingIcon" class="hidden animate-spin ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultArea" class="hidden mt-8 border-t border-gray-200 pt-6 animate-fade-in">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">Analysis Results</h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Score Box -->
+                    <div class="bg-gray-50 p-5 rounded-sm border border-gray-200 text-center hover:shadow-md transition-shadow">
+                        <span class="block text-gray-500 text-xs uppercase tracking-wider">Score (0-100)</span>
+                        <span id="scoreValue" class="block text-4xl font-light text-gray-900 mt-2">--</span>
+                    </div>
+
+                    <!-- Confidence Box -->
+                    <div class="bg-gray-50 p-5 rounded-sm border border-gray-200 text-center hover:shadow-md transition-shadow">
+                        <span class="block text-gray-500 text-xs uppercase tracking-wider">Confidence</span>
+                        <span id="confidenceValue" class="block text-4xl font-light text-gray-900 mt-2">--</span>
+                    </div>
+
+                    <!-- Quality Box -->
+                    <div class="bg-gray-50 p-5 rounded-sm border border-gray-200 text-center relative overflow-hidden hover:shadow-md transition-shadow">
+                        <span class="block text-gray-500 text-xs uppercase tracking-wider">Quality Label</span>
+                        <span id="labelValue" class="block text-2xl font-medium hsbc-red-text mt-3">--</span>
+                        <div class="absolute bottom-0 left-0 w-full h-1 hsbc-red"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Error Message -->
+            <div id="errorArea" class="hidden mt-4 p-4 bg-red-50 text-[#db0011] border border-red-100 rounded-sm text-sm text-center"></div>
+
+        </div>
+        
+        <!-- Footer -->
+        <div class="bg-gray-50 p-4 border-t border-gray-200 text-center">
+            <p class="text-xs text-gray-400">&copy; 2025 Model Inference System. All rights reserved.</p>
+        </div>
+    </div>
+
+    <script>
+        async function analyzeText() {
+            const text = document.getElementById('inputText').value;
+            const btn = document.getElementById('submitBtn');
+            const btnText = document.getElementById('btnText');
+            const loadingIcon = document.getElementById('loadingIcon');
+            const resultArea = document.getElementById('resultArea');
+            const errorArea = document.getElementById('errorArea');
+
+            // Reset UI
+            errorArea.classList.add('hidden');
+            resultArea.classList.add('hidden');
+
+            if (!text.trim()) {
+                errorArea.textContent = "Please enter some text to analyze.";
+                errorArea.classList.remove('hidden');
+                return;
+            }
+
+            // Loading State
+            btn.disabled = true;
+            btnText.textContent = "Processing...";
+            loadingIcon.classList.remove('hidden');
+
+            try {
+                // Assuming local API on port 8000
+                const response = await fetch('http://127.0.0.1:8000/live_infer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: text })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+
+                // Update UI with Data
+                document.getElementById('scoreValue').textContent = data.Expected_Score_0_100;
+                document.getElementById('confidenceValue').textContent = (data.Confidence * 100).toFixed(1) + '%';
+                document.getElementById('labelValue').textContent = data.Label || "Unknown";
+                
+                resultArea.classList.remove('hidden');
+
+            } catch (error) {
+                console.error(error);
+                errorArea.textContent = "Connection Error: " + error.message;
+                errorArea.classList.remove('hidden');
+            } finally {
+                // Reset Button
+                btn.disabled = false;
+                btnText.textContent = "Analyze Text";
+                loadingIcon.classList.add('hidden');
+            }
+        }
+    </script>
+</body>
+</html>
