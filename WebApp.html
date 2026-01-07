@@ -24,17 +24,13 @@
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <div class="bg-white rounded-sm shadow-xl w-full max-w-3xl overflow-hidden border-t-4 border-[#db0011]">
+    <div class="bg-white rounded-sm shadow-xl w-full max-w-4xl overflow-hidden border-t-4 border-[#db0011]">
         
         <!-- Header -->
         <div class="bg-white p-6 border-b border-gray-200 flex items-center justify-between">
             <div class="flex items-center gap-4">
                 
                 <!-- HSBC Logo Section -->
-                <!-- 
-                   Priority 1: Uses the file you uploaded (image_6e865c.png)
-                   Priority 2 (Fallback): Uses the official SVG from Wikimedia if local file is missing
-                -->
                 <img 
                     src="./image_6e865c.png" 
                     onerror="this.onerror=null; this.src='https://upload.wikimedia.org/wikipedia/commons/a/aa/HSBC_logo_%282018%29.svg';" 
@@ -62,9 +58,12 @@
                     placeholder="Type or paste your content here..."></textarea>
             </div>
 
-            <div class="flex justify-end">
+            <!-- Buttons Action Area -->
+            <div class="flex flex-col md:flex-row justify-end items-center gap-3 border-t border-gray-100 pt-6">
+                
+                <!-- Button 1: Analyze Text (Gray) -->
                 <button onclick="analyzeText()" id="submitBtn"
-                    class="hsbc-red hsbc-hover text-white font-medium py-3 px-8 rounded-sm transition duration-200 flex items-center shadow-sm uppercase tracking-wide text-sm">
+                    class="w-full md:w-auto bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-8 rounded-sm transition duration-200 flex justify-center items-center shadow-sm uppercase tracking-wide text-sm">
                     <span id="btnText">Analyze Text</span>
                     <!-- Loading Spinner -->
                     <svg id="loadingIcon" class="hidden animate-spin ml-3 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -72,30 +71,36 @@
                         <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
                 </button>
+
+                <!-- Button 2: Rewrite (Gray) -->
+                <button type="button" onclick="alert('Feature coming soon: Agile Rewrite')" 
+                    class="w-full md:w-auto bg-gray-500 hover:bg-gray-600 text-white font-medium py-3 px-6 rounded-sm transition duration-200 text-sm uppercase tracking-wide">
+                    Rewrite with Agile Standards
+                </button>
+
+                <!-- Button 3: Search (Red - HSBC Style) -->
+                <button type="button" onclick="alert('Feature coming soon: Project Search')" 
+                    class="w-full md:w-auto hsbc-red hsbc-hover text-white font-medium py-3 px-6 rounded-sm transition duration-200 text-sm uppercase tracking-wide">
+                    Search for similar projects in HSBC
+                </button>
             </div>
 
             <!-- Results Section -->
             <div id="resultArea" class="hidden mt-8 border-t border-gray-200 pt-6 animate-fade-in">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">Analysis Results</h3>
                 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- Changed to 2 columns since we removed the Label box -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Score Box -->
-                    <div class="bg-gray-50 p-5 rounded-sm border border-gray-200 text-center hover:shadow-md transition-shadow">
+                    <div class="bg-gray-50 p-6 rounded-sm border border-gray-200 text-center hover:shadow-md transition-shadow">
                         <span class="block text-gray-500 text-xs uppercase tracking-wider">Score (0-100)</span>
-                        <span id="scoreValue" class="block text-4xl font-light text-gray-900 mt-2">--</span>
+                        <span id="scoreValue" class="block text-5xl font-light text-gray-900 mt-3">--</span>
                     </div>
 
                     <!-- Confidence Box -->
-                    <div class="bg-gray-50 p-5 rounded-sm border border-gray-200 text-center hover:shadow-md transition-shadow">
+                    <div class="bg-gray-50 p-6 rounded-sm border border-gray-200 text-center hover:shadow-md transition-shadow">
                         <span class="block text-gray-500 text-xs uppercase tracking-wider">Confidence</span>
-                        <span id="confidenceValue" class="block text-4xl font-light text-gray-900 mt-2">--</span>
-                    </div>
-
-                    <!-- Quality Box -->
-                    <div class="bg-gray-50 p-5 rounded-sm border border-gray-200 text-center relative overflow-hidden hover:shadow-md transition-shadow">
-                        <span class="block text-gray-500 text-xs uppercase tracking-wider">Quality Label</span>
-                        <span id="labelValue" class="block text-2xl font-medium hsbc-red-text mt-3">--</span>
-                        <div class="absolute bottom-0 left-0 w-full h-1 hsbc-red"></div>
+                        <span id="confidenceValue" class="block text-5xl font-light text-gray-900 mt-3">--</span>
                     </div>
                 </div>
             </div>
@@ -156,9 +161,11 @@
                 }
 
                 // Update UI with Data
-                document.getElementById('scoreValue').textContent = data.Expected_Score_0_100;
+                // Round the score to remove decimals
+                document.getElementById('scoreValue').textContent = Math.round(data.Expected_Score_0_100);
                 document.getElementById('confidenceValue').textContent = (data.Confidence * 100).toFixed(1) + '%';
-                document.getElementById('labelValue').textContent = data.Label || "Unknown";
+                
+                // Label handling is removed as requested
                 
                 resultArea.classList.remove('hidden');
 
