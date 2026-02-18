@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <title>Conway's Game of Life – Web</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+        background-color: #f7f7f7;
+      }
+      #gameCanvas {
+        border: 1px solid #ddd;
+        display: block;
+        margin: 0 auto;
+        background-color: #ffffff;
+      }
+      .controls {
+        text-align: center;
+        margin-top: 10px;
+      }
+      button {
+        margin: 0 5px;
+        padding: 5px 10px;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1 style="text-align:center">Conway's Game of Life (JavaScript)</h1>
+    <canvas id="gameCanvas" width="600" height="600"></canvas>
+    <div class="controls">
+      <button id="startBtn">Start</button>
+      <button id="stopBtn" disabled>Stop</button>
+      <button id="randomBtn">Randomize</button>
+      <button id="clearBtn">Clear</button>
+    </div>
+    <script>
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const rows = 60;
+      const cols = 60;
+      const cellSize = canvas.width / cols;
+      let grid = createEmptyGrid();
+      let running = false;
+      let timerId = null;
+
+      function createEmptyGrid() {
+        const a = [];
+        for (let i = 0; i < rows; i++) {
+          a[i] = [];
+          for (let j = 0; j < cols; j++) {
+            a[i][j] = 0;
+          }
+        }
+        return a;
+      }
+
+      function randomizeGrid() {
+        grid = createEmptyGrid();
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            grid[i][j] = Math.random() < 0.2 ? 1 : 0;
+          }
+        }
+        drawGrid();
+      }
+
+      function clearGrid() {
+        grid = createEmptyGrid();
+        drawGrid();
+      }
+
+      function drawGrid() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            ctx.fillStyle = grid[i][j] ? '#2e8b57' : '#ffffff';
+            ctx.fillRect(j * cellSize, i * cellSize, cellSize, cellSize);
+            ctx.strokeStyle = '#e0e0e0';
+            ctx.strokeRect(j * cellSize, i * cellSize, cellSize, cellSize);
+          }
+        }
+      }
+
+      function getNeighborCount(x, y) {
+        let count = 0;
+        for (let dx = -1; dx <= 1; dx++) {
+          for (let dy = -1; dy <= 1; dy++) {
+            if (dx === 0 && dy === 0) continue;
+            const nx = x + dx;
+            const ny = y + dy;
+            if (nx >= 0 && nx < rows && ny >= 0 && ny < cols) {
+              count += grid[nx][ny];
+            }
+          }
+        }
+        return count;
+      }
+
+      function step() {
+        const newGrid = createEmptyGrid();
+        for (let i = 0; i < rows; i++) {
+          for (let j = 0; j < cols; j++) {
+            const neighbors = getNeighborCount(i, j);
+            if (grid[i][j]) {
+              newGrid[i][j] = neighbors === 2 || neighbors === 3 ? 1 : 0;
+            } else {
+              newGrid[i][j] = neighbors === 3 ? 1 : 0;
+            }
+          }
+        }
+        grid = newGrid;
+        drawGrid();
+      }
+
+      canvas.addEventListener('click', function (event) {
+        const rect = canvas.getBoundingClientRect();
+        const x = event.clientX - rect.left;
+        const y = event.clientY - rect.top;
+        const row = Math.floor(y / cellSize);
+        const col = Math.floor(x / cellSize);
+        grid[row][col] = grid[row][col] ? 0 : 1;
+        drawGrid();
+      });
+
+      document.getElementById('startBtn').addEventListener('click', function () {
+        if (!running) {
+          running = true;
+          this.disabled = true;
+          document.getElementById('stopBtn').disabled = false;
+          timerId = setInterval(step, 200);
+        }
+      });
+
+      document.getElementById('stopBtn').addEventListener('click', function () {
+        if (running) {
+          running = false;
+          this.disabled = true;
+          document.getElementById('startBtn').disabled = false;
+          clearInterval(timerId);
+        }
+      });
+
+      document.getElementById('randomBtn').addEventListener('click', function () {
+        randomizeGrid();
+      });
+
+      document.getElementById('clearBtn').addEventListener('click', function () {
+        clearGrid();
+      });
+
+      // Draw initial empty grid
+      drawGrid();
+    </script>
+  </body>
+</html>

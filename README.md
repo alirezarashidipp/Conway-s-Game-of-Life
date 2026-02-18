@@ -1,56 +1,93 @@
-# Conway's Game of Life
+# Conway's Game of Life – Enhanced Version
 
-This repository contains a refactored implementation of **Conway's Game of Life**.  The goal of this refactor is to take the original single‑file prototype and organize it into a more maintainable, reusable structure.  The core rules of the Game of Life have been separated from the graphical user interfaces, making it easy to run simulations in different contexts.
+This repository contains a polished, modular implementation of **Conway's Game of Life**,
+the famous zero‑player cellular automaton devised by mathematician John Conway.  It is
+designed as a showcase project to demonstrate clean code architecture, testing and
+continuous integration.  The original prototype bundled all functionality into a single
+script; this refactor separates concerns and adds tooling around the core logic so
+anyone can extend or reuse the project with ease.
 
-## Features
+## Key Features
 
-- **Modular design** – game logic lives in `pylife/game_of_life.py`, while the Pygame‑based visualisation is isolated in `pylife/gui.py`.  A simple Tkinter front‑end is provided in `main.py`.
-- **Random grid generation** – generate a random initial grid of any size using `create_random_grid`.
-- **Interactive simulation** – a Tkinter dialog lets you choose the grid dimensions before launching the simulation.
+- **Modular core engine** – The game rules and grid manipulation live in
+  `pylife/game_of_life.py`, making the logic easy to test and reuse.
+- **Pattern library** – Common starting patterns (glider, blinker, toad, etc.) are
+  included in `pylife/patterns.py` for quick experimentation.
+- **Pygame interface** – A smooth graphical interface (`pylife/gui.py`) lets you
+  watch the simulation evolve, pause/resume, toggle cells with the mouse and adjust
+  speed on the fly.
+- **Tkinter launcher** – A simple GUI (`main.py`) prompts you for the grid size
+  and starting pattern before launching the Pygame simulation.
+- **Web simulation** – An HTML+JavaScript demo (`webapp/index.html`) showcases the
+  Game of Life in a browser without any Python dependencies.
+- **Unit tests** – Tests in `tests/` verify that the core rules behave correctly on
+  known patterns using `pytest`.
+- **Continuous integration** – A GitHub Actions workflow runs the tests on each push
+  to ensure code quality.
+- **Packaging metadata** – A `pyproject.toml` is provided to build and distribute
+  the `pylife` package.
 
-## Requirements
+## Installation
 
-Install the required dependencies using `pip`:
+Create a virtual environment (optional) and install the requirements:
 
 ```bash
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-> **Note:** `tkinter` ships with most Python distributions, but on Linux you may need to install an extra package such as `python3‑tk`.
+On Linux you may need to install an extra package for Tkinter, e.g.
+`sudo apt install python3‑tk`.
 
-## Running the simulation
+## Running the Simulation
 
-After installing the requirements, run the main module to start the Tkinter UI:
+Run the Tkinter front‑end to select the grid size and starting pattern:
 
 ```bash
 python main.py
 ```
 
-Enter the number of rows and columns in the dialog and click **Start Simulation**.  A separate window will open showing the grid evolving according to Conway's rules.
+Alternatively you can run the Pygame simulation directly from code:
 
-## Project structure
+```bash
+python -m pylife.gui --rows 50 --cols 50 --pattern glider
+```
+
+Open `webapp/index.html` in your browser to experiment with the JavaScript
+version.
+
+## Project Structure
 
 ```
-refactored_conway_game/
+conway_game_of_life/
 ├── main.py              # Tkinter front‑end launching the Pygame simulation
+├── pyproject.toml       # Packaging information for pylife
 ├── requirements.txt     # Python dependencies
-├── .gitignore           # Files/directories that should not be committed
-└── src/
-    └── pylife/
-        ├── __init__.py   # Makes pylife a package
-        ├── game_of_life.py  # Core Game of Life logic
-        └── gui.py        # Pygame visualisation of the grid
+├── webapp/              # Static HTML/JS demo of the Game of Life
+├── src/
+│   └── pylife/
+│       ├── __init__.py   # Makes pylife a package
+│       ├── game_of_life.py  # Core Game of Life logic
+│       ├── gui.py        # Pygame visualisation and controls
+│       └── patterns.py   # Built‑in starting patterns
+└── tests/
+    └── test_game_of_life.py  # Unit tests for the core logic
 ```
 
-## Future improvements
+## Contributing and Improvements
 
-This refactor intentionally keeps the scope small.  For a truly production‑ready project, consider adding:
+This project is intentionally kept small but fully functional.  There are many
+ways to extend it:
 
-- **Automated tests** for the game logic (`pytest` or `unittest`)
-- **Continuous integration** (e.g. GitHub Actions) to run tests and linting on pull requests
-- **Packaging metadata** (e.g. a `pyproject.toml` with `[project]` settings) if you plan to publish to PyPI
-- **Command‑line interface** for non‑GUI usage
+- Add more patterns to `pylife/patterns.py`.
+- Implement a command‑line interface for running simulations without a GUI.
+- Use numpy arrays for faster grid updates.
+- Add support for infinite grids with edge wrapping.
+- Expand the web demo with pattern loading and exporting.
+
+Pull requests and feedback are welcome!
 
 ## License
 
-The original repository did not specify a licence.  Consider adding an open‑source licence such as MIT or GPL if you intend to distribute this project.
+Distributed under the MIT License.  See `LICENSE` for details.

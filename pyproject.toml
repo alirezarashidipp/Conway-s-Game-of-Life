@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pylife"
+version = "0.1.0"
+description = "A modular implementation of Conway's Game of Life"
+authors = [ { name = "Ali", email = "example@example.com" } ]
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT License" }
+dependencies = [
+    "pygame>=2.0"
+]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+pylife-gui = "pylife.gui:cli"
